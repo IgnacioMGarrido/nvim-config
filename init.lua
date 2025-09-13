@@ -125,14 +125,36 @@ vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position"
 -- Quick config editing
 vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
 
+-- Auto reload files if changed externally
+vim.api.nvim_create_autocmd(
+    { "FocusGained" },
+    { command = "checktime" }
+)
 
--- ============================================================================
--- PLUGINS
+-- execute make per project
+-- needs to create an .nvim.lua per project
+vim.opt.exrc = true
+vim.opt.secure = true
+-- Quick fix after make
+vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+    pattern = { "make", "grep" },
+    callback = function()
+        vim.cmd("vert copen")
+    end,
+})
 
+vim.api.nvim_create_user_command("Vmake", function(opts)
+    local cmd = vim.o.makeprg .. " " .. (opts.args or "")
+    vim.cmd("vnew")
+    vim.cmd("setlocal buftype=nofile bufhidden=hide noswapfile")
+    vim.fn.termopen(cmd)
+end, { nargs = "*" })
+
+
+vim.keymap.set("n", "<leader>l", ":Vmake<CR>", { desc = "Make project" })
 -- ============================================================================
 
 -- Theme
-vim.cmd.colorscheme("vague")
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })

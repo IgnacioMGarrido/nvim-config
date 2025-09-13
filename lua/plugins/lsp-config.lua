@@ -20,38 +20,6 @@ return {
         end
     },
     {
-        url = "https://gitlab.com/jlafarr99/sonarlint.nvim",
-        dependencies = {
-            "neovim/nvim-lspconfig",
-            "mason-org/mason.nvim",
-        },
-        config = function()
-            require("sonarlint").setup({
-                server = {
-                    cmd = {
-                        "sonarlint-language-server",
-                        "-stdio",
-                        "-analyzers",
-                        -- SOLO C/C++: usa únicamente el analyzer de C-family
-                        vim.fn.expand("$MASON/share/sonarlint-analyzers/sonarcfamily.jar"),
-                    },
-                    -- settings = {
-                    --   sonarlint = {
-                    --     analyzerProperties = {
-                    --       -- if using compilecommands
-                    --       ["sonar.cfamily.compile-commands"] =
-                    --         vim.fn.getcwd() .. "/build/compile_commands.json",
-                    --     },
-                    --   },
-                    -- },
-                },
-                -- using on cpp files
-                filetypes = { "c", "cpp", "objc", "objcpp" },
-            })
-        end,
-    },
-
-    {
         'neovim/nvim-lspconfig',
         dependencies = {
             { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
@@ -59,9 +27,6 @@ return {
             {
                 'whoissethdaniel/mason-tool-installer.nvim',
                 opts = {
-                    ensure_installed = {
-                        'sonarlint-language-server',
-                    },
                     run_on_start = true,
                 }
             },
