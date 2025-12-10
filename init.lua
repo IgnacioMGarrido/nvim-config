@@ -163,6 +163,41 @@ vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
 -- USEFUL FUNCTIONS
 -- ============================================================================
 
+local function number_tests(opts)
+  local buf = 0
+  local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+  local lookahead = 5
+  local n = 0
+  local i = 1
+
+  while i <= #lines do
+    if lines[i]:match("^%s*TEST_CASE_METHOD%(") then
+      local j = i + 1
+      local maxj = math.min(#lines, i + lookahead)
+      while j <= maxj do
+        if lines[j]:match('^%s*".*') then
+          local line = lines[j]
+          line = line:gsub('^(%s*")TC%d+%s+%-%s+', '%1', 1)
+          line = line:gsub('^(%s*")%d+%s+%-%s+', '%1', 1)
+          n = n + 1
+          local prefix = string.format("TC%02d - ", n)
+          line = line:gsub('^(%s*")', '%1' .. prefix, 1)
+          lines[j] = line
+          i = j
+          break
+        end
+        j = j + 1
+      end
+    end
+    i = i + 1
+  end
+
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+end
+
+vim.api.nvim_create_user_command("NumberTests", function() number_tests() end, {})
+vim.keymap.set("n", "<leader>tn", function() number_tests() end, { desc = "Number TEST_CASE_METHOD" })
+
 vim.keymap.set("n", "<leader>bg", function()
     local hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     local is_transparent = hl.bg == nil or hl.bg == "none"
@@ -216,6 +251,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         end
     end,
 })
+
 
 -- ============================================================================
 
