@@ -103,7 +103,9 @@ Launch configs are defined per-project in `.nvim.lua` at the project root (loade
 | Key | Action |
 |---|---|
 | `<leader>l` | Build project (output + quickfix on error) |
-| `<leader>bt` | Run unit tests (project-local) |
+| `<leader>bt` | Run unit tests with filter prompt (project-local) |
+| `<leader>bT` | Run test under cursor (project-local) |
+| `<leader>dT` | Debug test under cursor (project-local) |
 | `]q` / `[q` | Next / prev error (wraps) |
 | `<CR>` in quickfix | Open error in source window |
 
