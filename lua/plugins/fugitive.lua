@@ -8,7 +8,7 @@ return {
         {
             "<leader>mD",
             function()
-                -- lista local + remotas (filtra duplicados y vacíos)
+                -- local + remote branches (dedup and filter empty)
                 local branches = vim.fn.systemlist(
                     "git for-each-ref --format='%(refname:short)' refs/heads refs/remotes | sort -u"
                 )
@@ -27,7 +27,6 @@ return {
         { "<leader>mw", ":Gwrite<CR>", desc = "Git write (stage)" },
     },
     config = function()
-        -- Opcional: cualquier configuración extra de fugitive
         vim.g.fugitive_git_executable = "git"
     end,
 }

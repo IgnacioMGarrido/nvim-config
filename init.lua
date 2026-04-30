@@ -70,12 +70,10 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.redrawtime = 10000
 vim.opt.maxmempattern = 20000
 
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
+vim.g.have_nerd_font = true
 
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
-vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Close current buffe" })
+vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Close current buffer" })
 -- Y to EOL
 vim.keymap.set('n', "Y", "y$", { desc = "Yank to end of line." })
 
@@ -123,7 +121,9 @@ vim.keymap.set("n", "<leader>ff", ":find ", { desc = "Find file" })
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
 
 -- Quick config editing
-vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
+vim.keymap.set("n", "<leader>rc", function()
+    vim.cmd("e " .. vim.fn.stdpath('config') .. "/init.lua")
+end, { desc = "Edit config" })
 
 -- Auto reload files if changed externally
 vim.api.nvim_create_autocmd(
@@ -152,13 +152,6 @@ end, { nargs = "*" })
 
 
 vim.keymap.set("n", "<leader>l", ":Vmake<CR>", { desc = "Make project" })
--- ============================================================================
-
--- Theme
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
-
 -- ============================================================================
 -- USEFUL FUNCTIONS
 -- ============================================================================
@@ -295,19 +288,8 @@ vim.api.nvim_create_user_command("NumberTests", function() number_tests() end, {
 vim.keymap.set("n", "<leader>tn", function() number_tests() end, { desc = "Number TEST_CASE_METHOD" })
 
 vim.keymap.set("n", "<leader>bg", function()
-    local hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-    local is_transparent = hl.bg == nil or hl.bg == "none"
-
-    if is_transparent then
-        vim.api.nvim_set_hl(0, "Normal", { bg = "#1e1e2e" })
-        vim.api.nvim_set_hl(0, "NormalNC", { bg = "#1e1e2e" })
-        vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "#1e1e2e" })
-    else
-        vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-        vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-        vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "none" })
-    end
-end)
+    require("config.theme").toggle_transparent()
+end, { desc = "Toggle transparent background" })
 
 -- Copy Full File-Path
 vim.keymap.set("n", "<leader>pa", function()
