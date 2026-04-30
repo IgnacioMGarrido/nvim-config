@@ -373,6 +373,14 @@ end)
 
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
+-- Neovim 0.11 bug: treesitter highlighter crashes on terminal buffers
+vim.api.nvim_create_autocmd("TermOpen", {
+    group = augroup,
+    callback = function()
+        pcall(vim.treesitter.stop)
+    end,
+})
+
 -- Highlight yanked text
 vim.api.nvim_create_autocmd("TextYankPost", {
     group = augroup,
