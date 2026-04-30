@@ -10,6 +10,7 @@ vim.o.wrap = true
 vim.o.scrolloff = 10
 vim.o.sidescrolloff = 8
 vim.o.clipboard = "unnamedplus"
+vim.opt.switchbuf = { 'useopen', 'uselast' }
 
 -- Indentation
 vim.o.tabstop = 4
@@ -84,7 +85,15 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page down (centered)" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up (centered)" })
 
 -- Delete without yanking
-vim.keymap.set({ "n", "v" }, "<leader>d", '"_d', { desc = "Delete without yanking" })
+vim.keymap.set({ "n", "v" }, "<leader>D", '"_d', { desc = "Delete without yanking" })
+
+-- Quickfix navigation with wraparound
+vim.keymap.set('n', ']q', function()
+    if not pcall(vim.cmd, 'cnext') then vim.cmd('cfirst') end
+end, { desc = 'Next quickfix (wraps)' })
+vim.keymap.set('n', '[q', function()
+    if not pcall(vim.cmd, 'cprev') then vim.cmd('clast') end
+end, { desc = 'Prev quickfix (wraps)' })
 
 -- Buffer navigation
 vim.keymap.set("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
@@ -143,15 +152,79 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     end,
 })
 
+local _vmake_source_win = nil
+
+-- In the quickfix window, open errors in the source window that triggered the build
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'qf',
+    callback = function()
+        vim.keymap.set('n', '<CR>', function()
+            local item = vim.fn.getqflist()[vim.fn.line('.')]
+            if not item then return end
+
+            local target = (_vmake_source_win and vim.api.nvim_win_is_valid(_vmake_source_win))
+                and _vmake_source_win
+                or nil
+
+            if not target then
+                vim.cmd('vsplit')
+                target = vim.api.nvim_get_current_win()
+            end
+
+            vim.api.nvim_set_current_win(target)
+            if item.bufnr ~= 0 and vim.api.nvim_buf_is_loaded(item.bufnr) then
+                vim.api.nvim_win_set_buf(target, item.bufnr)
+            else
+                vim.cmd('edit ' .. vim.fn.fnameescape(item.filename ~= '' and item.filename or vim.fn.bufname(item.bufnr)))
+            end
+            vim.api.nvim_win_set_cursor(target, { item.lnum, math.max(0, item.col - 1) })
+        end, { buffer = true })
+    end,
+})
+
 vim.api.nvim_create_user_command("Vmake", function(opts)
-    local cmd = vim.o.makeprg .. " " .. (opts.args or "")
+    local cmd = vim.o.makeprg .. (opts.args ~= "" and " " .. opts.args or "")
+    _vmake_source_win = vim.api.nvim_get_current_win()
     vim.cmd("vnew")
     vim.cmd("setlocal buftype=nofile bufhidden=hide noswapfile")
-    vim.fn.termopen(cmd)
-end, { nargs = "*" })
 
+    if not opts.bang then
+        vim.fn.termopen(cmd)
+        return
+    end
 
-vim.keymap.set("n", "<leader>l", ":Vmake<CR>", { desc = "Make project" })
+    -- Close any existing quickfix window before starting a new build
+    vim.cmd('cclose')
+
+    -- Bang variant: capture output into buffer + populate quickfix on exit
+    local buf = vim.api.nvim_get_current_buf()
+    local win = vim.api.nvim_get_current_win()
+    local output = {}
+
+    local function append(data)
+        if not data then return end
+        if data[#data] == "" then table.remove(data) end
+        if #data == 0 then return end
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+        vim.list_extend(output, data)
+        pcall(vim.api.nvim_win_set_cursor, win, { vim.api.nvim_buf_line_count(buf), 0 })
+    end
+
+    vim.fn.jobstart(cmd, {
+        on_stdout = function(_, data) append(data) end,
+        on_stderr = function(_, data) append(data) end,
+        on_exit = function(_, code)
+            vim.fn.setqflist({}, ' ', { lines = output, efm = vim.o.errorformat })
+            if code ~= 0 then
+                pcall(vim.api.nvim_win_close, win, true)
+                vim.cmd('vert copen')
+                vim.cmd('vertical resize ' .. math.floor(vim.o.columns / 2))
+            end
+        end,
+    })
+end, { nargs = "*", bang = true })
+
+vim.keymap.set("n", "<leader>l", ":Vmake!<CR>", { desc = "Make project" })
 -- ============================================================================
 -- USEFUL FUNCTIONS
 -- ============================================================================
