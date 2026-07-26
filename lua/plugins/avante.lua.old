@@ -75,7 +75,6 @@ return {
     "MunifTanjim/nui.nvim",
     --- The below dependencies are optional,
     "nvim-tree/nvim-web-devicons",
-    "zbirenbaum/copilot.lua",
     {
       "HakonHarnes/img-clip.nvim",
       event = "VeryLazy",

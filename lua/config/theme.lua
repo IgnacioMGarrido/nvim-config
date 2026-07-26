@@ -1,7 +1,10 @@
 local theme = {}
 
 theme.opts = {
-    flavour = "mocha", -- latte, frappe, macchiato, mocha
+    flavour = "frappe", -- latte, frappe, macchiato, mocha
+    -- flavour = "latte",
+    -- flavour = "macchiato",
+    -- flavour = "mocha",
     transparent_background = false,
     integrations = {
         cmp = true,
