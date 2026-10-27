@@ -3,6 +3,11 @@ local theme = {}
 theme.opts = {
     theme = "lotus",
     transparent = false,
+    colors = {
+        palette = {
+            lotusWhite3 = "#e5ddb0",
+        },
+    },
 }
 
 function theme.apply()
