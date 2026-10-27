@@ -27,4 +27,31 @@ vim.g.clangd_cmd = { '/custom/clangd', '--background-index' }
 spec.config()
 assert(vim.deep_equal(vim.lsp.config.clangd.cmd, vim.g.clangd_cmd))
 
+local first = vim.api.nvim_get_current_buf()
+local second = vim.api.nvim_create_buf(true, false)
+local hints = { [first] = false, [second] = true }
+vim.lsp.inlay_hint.is_enabled = function(filter) return hints[filter.bufnr] end
+vim.lsp.inlay_hint.enable = function(enabled, filter)
+    for buf in pairs(hints) do
+        if not filter or filter.bufnr == buf then hints[buf] = enabled end
+    end
+end
+vim.lsp.get_client_by_id = function()
+    return {
+        supports_method = function(method)
+            return method == vim.lsp.protocol.Methods.textDocument_inlayHint
+        end,
+    }
+end
+package.loaded['telescope.builtin'] = setmetatable({}, {
+    __index = function() return function() end end,
+})
+vim.api.nvim_exec_autocmds('LspAttach', { buffer = first, data = { client_id = 1 } })
+local toggle = vim.fn.maparg('\\th', 'n', false, true).callback
+vim.api.nvim_set_current_buf(second)
+toggle()
+assert(hints[first] == true and hints[second] == true)
+toggle()
+assert(hints[first] == false and hints[second] == true, 'toggling must not affect other buffers')
+
 print('LSP configuration tests passed')
