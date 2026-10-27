@@ -1,13 +1,23 @@
 # Neovim Config
 
-Personal Neovim setup focused on C++ development with LSP, debugging, and AI assistance.
+Personal Neovim setup focused on C++ development with LSP, debugging, and note-taking.
 
 ## Requirements
 
-- Neovim >= 0.9
+- Neovim >= 0.11.3
 - [Nerd Font](https://www.nerdfonts.com/) (icons throughout)
-- `make`, `git`, `ripgrep`, `fd`
-- `clangd` for C/C++ LSP
+- `make`, `git`, `ripgrep` (`fd` is optional)
+- A C compiler, `tar`, and `curl` for Tree-sitter parsers
+- Node.js and npm for Markdown linting
+- Java and Zig when using their language servers; Zig is also needed for Zig formatting
+
+Mason installs `clangd`, `lua_ls`, `jdtls`, `zls`, and `codelldb`.
+Mason Tool Installer provisions `stylua`, `clang-format`, and `markdownlint`;
+run `:MasonToolsInstallSync` to install missing tools immediately.
+
+Plugin revisions are tracked in `lazy-lock.json`. Use `:Lazy restore` to restore
+them, and commit lockfile changes after intentional updates. Tree-sitter stays
+on its compatible `master` branch rather than the incompatible `main` rewrite.
 
 ## Structure
 
@@ -16,8 +26,13 @@ nvim/
 ├── init.lua              # Core settings, keymaps, autocmds
 ├── lua/
 │   ├── config/
-│   │   └── lazy.lua      # Plugin manager bootstrap
+│   │   ├── lazy.lua      # Plugin manager bootstrap
+│   │   ├── build.lua     # Vmake and quickfix integration
+│   │   ├── cpp.lua       # GMock conversion and test numbering
+│   │   └── theme.lua     # Colorscheme and transparency
 │   └── plugins/          # One file per plugin
+├── tests/                # Headless Lua regression tests
+├── lazy-lock.json        # Pinned plugin revisions
 └── README.md
 ```
 
@@ -31,18 +46,21 @@ nvim/
 | [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) + mason | LSP (clangd, lua_ls, jdtls, zls) |
 | [nvim-dap](https://github.com/mfussenegger/nvim-dap) + codelldb | C++ debugger via DAP |
 | [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) | Debugger UI panels |
-| [avante.nvim](https://github.com/yetone/avante.nvim) | AI code assistant |
 | [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) | Autocompletion |
-| [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatting (clang-format, stylua) |
+| [conform.nvim](https://github.com/stevearc/conform.nvim) | Formatting (clang-format, stylua, zig fmt) |
+| [nvim-lint](https://github.com/mfussenegger/nvim-lint) | Markdown linting |
 | [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) | Syntax highlighting |
 | [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Git hunk indicators |
 | [vim-fugitive](https://github.com/tpope/vim-fugitive) | Git commands |
+| [diffview.nvim](https://github.com/sindrets/diffview.nvim) | Diff and file history views |
 | [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) | File tree |
 | [oil.nvim](https://github.com/stevearc/oil.nvim) | Directory editor |
 | [mini.nvim](https://github.com/echasnovski/mini.nvim) | Surround, text objects, statusline |
 | [catppuccin](https://github.com/catppuccin/nvim) | Colorscheme |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | Keymap hints |
 | [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | TODO/FIXME highlights |
+| [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) | Markdown vaults and daily notes |
+| [orgmode](https://github.com/nvim-orgmode/orgmode) | Org notes and agenda |
 
 ---
 
@@ -143,8 +161,12 @@ Launch configs are defined per-project in `.nvim.lua` at the project root (loade
 |---|---|
 | `<leader>f` | Format buffer |
 | `<leader>D` | Delete without yanking |
-| `<A-j>` / `<A-k>` | Move line / selection up or down |
+| `<A-J>` / `<A-K>` | Move line / selection up or down |
 | `<leader>tm` | Convert virtual method → GMock `MOCK_METHOD` |
+| `<leader>tn` | Number `TEST_CASE_METHOD` test names |
+
+Swap files and temporary write-backups are enabled for recovery and safer saves.
+Permanent backup files remain disabled; persistent undo is enabled.
 
 ---
 
@@ -173,3 +195,18 @@ dap.configurations.cpp = {
 ```
 
 For git worktrees, symlink the `.nvim.lua` files from the main tree into the corresponding paths in each worktree so they're picked up automatically.
+
+Project-local LSP overrides can use
+`vim.lsp.config('clangd', { cmd = { '/path/to/clangd' } })`.
+The optional `vim.g.clangd_cmd` override is read during plugin setup, so it must
+be set before plugins load.
+
+## Regression tests
+
+Run from the configuration root; these tests do not load or install plugins:
+
+```sh
+for test in tests/*.lua; do
+    nvim --headless -u NONE -i NONE -l "$test" || exit 1
+done
+```
