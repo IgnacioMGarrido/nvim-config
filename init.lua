@@ -1,4 +1,5 @@
-require("config.lazy")
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 --
 -- Basic Settings
 --
@@ -72,6 +73,8 @@ vim.opt.redrawtime = 10000
 vim.opt.maxmempattern = 20000
 
 vim.g.have_nerd_font = true
+
+require("config.lazy")
 
 vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
 vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Close current buffer" })

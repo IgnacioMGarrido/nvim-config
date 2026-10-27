@@ -5,7 +5,14 @@ return {
     ft = 'markdown',
     dependencies = { 'nvim-lua/plenary.nvim' },
     init = function()
-        vim.opt.conceallevel = 2
+        vim.api.nvim_create_autocmd({ 'FileType', 'BufWinEnter' }, {
+            group = vim.api.nvim_create_augroup('ObsidianConceal', { clear = true }),
+            callback = function()
+                if vim.bo.filetype == 'markdown' then
+                    vim.opt_local.conceallevel = 2
+                end
+            end,
+        })
     end,
     opts = {
         workspaces = {
