@@ -56,7 +56,7 @@ nvim/
 | [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) | File tree |
 | [oil.nvim](https://github.com/stevearc/oil.nvim) | Directory editor |
 | [mini.nvim](https://github.com/echasnovski/mini.nvim) | Surround, text objects, statusline |
-| [catppuccin](https://github.com/catppuccin/nvim) | Colorscheme |
+| [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) | Kanagawa Wave colorscheme |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | Keymap hints |
 | [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | TODO/FIXME highlights |
 | [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) | Markdown vaults and daily notes |
@@ -164,6 +164,7 @@ Launch configs are defined per-project in `.nvim.lua` at the project root (loade
 | `<A-J>` / `<A-K>` | Move line / selection up or down |
 | `<leader>tm` | Convert virtual method → GMock `MOCK_METHOD` |
 | `<leader>tn` | Number `TEST_CASE_METHOD` test names |
+| `<leader>bg` | Toggle transparent background |
 
 Swap files and temporary write-backups are enabled for recovery and safer saves.
 Permanent backup files remain disabled; persistent undo is enabled.

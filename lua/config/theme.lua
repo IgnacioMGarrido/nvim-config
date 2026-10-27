@@ -1,40 +1,17 @@
 local theme = {}
 
 theme.opts = {
-    flavour = "frappe", -- latte, frappe, macchiato, mocha
-    -- flavour = "latte",
-    -- flavour = "macchiato",
-    -- flavour = "mocha",
-    transparent_background = false,
-    integrations = {
-        cmp = true,
-        gitsigns = true,
-        neo_tree = true,
-        treesitter = true,
-        telescope = { enabled = true },
-        mini = { enabled = true },
-        which_key = true,
-        indent_blankline = { enabled = true },
-        mason = true,
-        native_lsp = {
-            enabled = true,
-            underlines = {
-                errors = { "underline" },
-                hints = { "underline" },
-                warnings = { "underline" },
-                information = { "underline" },
-            },
-        },
-    },
+    theme = "wave",
+    transparent = false,
 }
 
 function theme.apply()
-    require("catppuccin").setup(theme.opts)
-    vim.cmd.colorscheme("catppuccin")
+    require("kanagawa").setup(theme.opts)
+    vim.cmd.colorscheme("kanagawa-wave")
 end
 
 function theme.toggle_transparent()
-    theme.opts.transparent_background = not theme.opts.transparent_background
+    theme.opts.transparent = not theme.opts.transparent
     theme.apply()
 end
 
