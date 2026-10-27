@@ -1,29 +1,9 @@
 return {
     {
-        "mason-org/mason.nvim",
-        opts = {},
-        config = function()
-            require("mason").setup()
-        end
-    },
-    {
-        "mason-org/mason-lspconfig.nvim",
-        opts = {},
-        dependencies = {
-            { "mason-org/mason.nvim", opts = {} },
-            "neovim/nvim-lspconfig",
-        },
-        config = function()
-            require("mason-lspconfig").setup({
-                ensure_installed = { "lua_ls", "clangd", "jdtls", "zls" }
-            })
-        end
-    },
-    {
         'neovim/nvim-lspconfig',
         dependencies = {
-            { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-            'williamboman/mason-lspconfig.nvim',
+            { 'mason-org/mason.nvim', opts = {} },
+            'mason-org/mason-lspconfig.nvim',
             {
                 'whoissethdaniel/mason-tool-installer.nvim',
                 opts = {
@@ -164,6 +144,7 @@ return {
 
             local servers = {
                 clangd = {
+                    cmd = vim.g.clangd_cmd or { "clangd" },
                     settings = {
                         clangd = {
                             completion = {
@@ -200,17 +181,13 @@ return {
             local capabilities = vim.lsp.protocol.make_client_capabilities()
             capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+            for server_name, server in pairs(servers) do
+                server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+                vim.lsp.config(server_name, server)
+            end
+
             require('mason-lspconfig').setup {
-                handlers = {
-                    function(server_name)
-                        local server = servers[server_name] or {}
-                        -- This handles overriding only values explicitly passed
-                        -- by the server configuration above. Useful when disabling
-                        -- certain features of an LSP (for example, turning off formatting for ts_ls)
-                        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-                        require('lspconfig')[server_name].setup(server)
-                    end,
-                },
+                ensure_installed = vim.tbl_keys(servers),
             }
         end
     }
