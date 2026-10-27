@@ -51,7 +51,7 @@ return {
         -- git stuff
         vim.keymap.set('n', '<leader>mf', builtin.git_branches, { desc = 'Git [B]ranches' })
         vim.keymap.set('n', '<leader>mc', builtin.git_commits, { desc = 'Git [C]ommits' })
-        vim.keymap.set('n', '<leader>ms', builtin.git_status, { desc = 'Git [S]tatus' })
+        vim.keymap.set('n', '<leader>mS', builtin.git_status, { desc = 'Git [S]tatus (Telescope)' })
         vim.keymap.set('n', '<leader>mC', builtin.git_bcommits, { desc = 'Git buffer [C]ommits' })
 
         -- Slightly advanced example of overriding default behavior and theme

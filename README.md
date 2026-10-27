@@ -115,7 +115,8 @@ Launch configs are defined per-project in `.nvim.lua` at the project root (loade
 
 | Key | Action |
 |---|---|
-| `<leader>ms` | Git status |
+| `<leader>ms` | Git status (Fugitive) |
+| `<leader>mS` | Git status (Telescope) |
 | `<leader>mb` | Git blame |
 | `<leader>md` | Diff (vertical split) |
 | `<leader>mf` | Branches |
