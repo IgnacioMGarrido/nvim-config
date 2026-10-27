@@ -48,7 +48,7 @@ return {
                     -- jump to the type of the word under your cursor.
                     --  useful when you're not sure what type a variable is and you want to see
                     --  the definition of its *type*, not where it was *defined*.
-                    map('<leader>d', require('telescope.builtin').lsp_type_definitions, 'type [d]efinition')
+                    map('gy', require('telescope.builtin').lsp_type_definitions, 'type definition')
 
                     -- fuzzy find all the symbols in your current document.
                     --  symbols are things like variables, functions, types, etc.

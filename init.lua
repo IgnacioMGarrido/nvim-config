@@ -76,7 +76,7 @@ vim.g.have_nerd_font = true
 
 require("config.lazy")
 
-vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
+vim.keymap.set('n', '<leader>rs', '<cmd>update<CR><cmd>source<CR>', { desc = 'Save and source current file' })
 vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Close current buffer" })
 -- Y to EOL
 vim.keymap.set('n', "Y", "y$", { desc = "Yank to end of line." })

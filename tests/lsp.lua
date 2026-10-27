@@ -43,10 +43,13 @@ vim.lsp.get_client_by_id = function()
         end,
     }
 end
-package.loaded['telescope.builtin'] = setmetatable({}, {
+local type_definition = function() end
+package.loaded['telescope.builtin'] = setmetatable({ lsp_type_definitions = type_definition }, {
     __index = function() return function() end end,
 })
 vim.api.nvim_exec_autocmds('LspAttach', { buffer = first, data = { client_id = 1 } })
+assert(vim.fn.maparg('gy', 'n', false, true).callback == type_definition)
+assert(vim.fn.maparg('\\d', 'n') == '', 'debug prefix must not run type definition')
 local toggle = vim.fn.maparg('\\th', 'n', false, true).callback
 vim.api.nvim_set_current_buf(second)
 toggle()

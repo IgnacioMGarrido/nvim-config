@@ -6,32 +6,29 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     end,
 })
 
-local _vmake_source_win = nil
-
 -- In the quickfix window, open errors in the source window that triggered the build
 vim.api.nvim_create_autocmd('FileType', {
     pattern = 'qf',
     callback = function()
         vim.keymap.set('n', '<CR>', function()
-            local item = vim.fn.getqflist()[vim.fn.line('.')]
-            if not item then return end
-
-            local target = (_vmake_source_win and vim.api.nvim_win_is_valid(_vmake_source_win))
-                and _vmake_source_win
-                or nil
-
-            if not target then
-                vim.cmd('vsplit')
-                target = vim.api.nvim_get_current_win()
+            local is_loclist = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1].loclist == 1
+            local row = vim.fn.line('.')
+            local items = is_loclist and vim.fn.getloclist(0) or vim.fn.getqflist()
+            local item = items[row]
+            if not item or item.valid ~= 1 then
+                vim.notify('No file location on this row', vim.log.levels.WARN)
+                return
             end
 
-            vim.api.nvim_set_current_win(target)
-            if item.bufnr ~= 0 and vim.api.nvim_buf_is_loaded(item.bufnr) then
-                vim.api.nvim_win_set_buf(target, item.bufnr)
-            else
-                vim.cmd('edit ' .. vim.fn.fnameescape(item.filename ~= '' and item.filename or vim.fn.bufname(item.bufnr)))
+            if not is_loclist then
+                local context = vim.fn.getqflist({ context = 0 }).context
+                local target = type(context) == 'table' and context.vmake_source_win or nil
+                if type(target) == 'number' and vim.api.nvim_win_is_valid(target) then
+                    vim.api.nvim_set_current_win(target)
+                end
             end
-            vim.api.nvim_win_set_cursor(target, { item.lnum, math.max(0, item.col - 1) })
+
+            vim.cmd((is_loclist and 'll ' or 'cc ') .. row)
         end, { buffer = true })
     end,
 })
@@ -39,7 +36,7 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_user_command("Vmake", function(opts)
     local cmd = vim.o.makeprg .. (opts.args ~= "" and " " .. opts.args or "")
     local errorformat = vim.o.errorformat
-    _vmake_source_win = vim.api.nvim_get_current_win()
+    local source_win = vim.api.nvim_get_current_win()
     vim.cmd("vnew")
     vim.cmd("setlocal buftype=nofile bufhidden=hide noswapfile")
 
@@ -83,7 +80,11 @@ vim.api.nvim_create_user_command("Vmake", function(opts)
             for _, stream in ipairs({ "stdout", "stderr" }) do
                 if partial[stream] ~= "" then append({ partial[stream] }) end
             end
-            vim.fn.setqflist({}, ' ', { lines = output, efm = errorformat })
+            vim.fn.setqflist({}, ' ', {
+                lines = output,
+                efm = errorformat,
+                context = { vmake_source_win = source_win },
+            })
             if code ~= 0 then
                 pcall(vim.api.nvim_win_close, win, true)
                 vim.cmd('vert copen')

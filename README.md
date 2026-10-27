@@ -90,6 +90,7 @@ nvim/
 | `gd` | Go to definition |
 | `gr` | Go to references |
 | `gi` | Go to implementation |
+| `gy` | Go to type definition |
 | `gD` | Go to declaration |
 | `<leader>rn` | Rename symbol |
 | `<leader>ca` | Code action |
@@ -165,6 +166,7 @@ Launch configs are defined per-project in `.nvim.lua` at the project root (loade
 | `<leader>tm` | Convert virtual method → GMock `MOCK_METHOD` |
 | `<leader>tn` | Number `TEST_CASE_METHOD` test names |
 | `<leader>bg` | Toggle transparent background |
+| `<leader>rs` | Save and source current file |
 
 Swap files and temporary write-backups are enabled for recovery and safer saves.
 Permanent backup files remain disabled; persistent undo is enabled.

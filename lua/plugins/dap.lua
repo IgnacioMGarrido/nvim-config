@@ -38,12 +38,24 @@ return {
             vim.fn.sign_define('DapLogPoint',            { text = '◎', texthl = 'DapLogPoint',            linehl = '', numhl = '' })
             vim.fn.sign_define('DapStopped',             { text = '▶', texthl = 'DapStopped',             linehl = 'DapStoppedLine', numhl = '' })
 
-            vim.api.nvim_set_hl(0, 'DapBreakpoint',         { fg = '#e06c75' })
-            vim.api.nvim_set_hl(0, 'DapBreakpointCondition',{ fg = '#e5c07b' })
-            vim.api.nvim_set_hl(0, 'DapBreakpointRejected', { fg = '#555555' })
-            vim.api.nvim_set_hl(0, 'DapLogPoint',           { fg = '#61afef' })
-            vim.api.nvim_set_hl(0, 'DapStopped',            { fg = '#98c379' })
-            vim.api.nvim_set_hl(0, 'DapStoppedLine',        { bg = '#2a3d2a' })
+            local function set_highlights()
+                for name, link in pairs({
+                    DapBreakpoint = 'DiagnosticError',
+                    DapBreakpointCondition = 'DiagnosticWarn',
+                    DapBreakpointRejected = 'Comment',
+                    DapLogPoint = 'DiagnosticInfo',
+                    DapStopped = 'DiagnosticInfo',
+                    DapStoppedLine = 'CursorLine',
+                }) do
+                    vim.api.nvim_set_hl(0, name, { link = link })
+                end
+            end
+
+            vim.api.nvim_create_autocmd('ColorScheme', {
+                group = vim.api.nvim_create_augroup('DapHighlights', { clear = true }),
+                callback = set_highlights,
+            })
+            set_highlights()
 
             require('nvim-dap-virtual-text').setup()
             dapui.setup({

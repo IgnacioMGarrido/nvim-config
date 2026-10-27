@@ -45,4 +45,15 @@ jump(']b', first, 100)
 breakpoints = {}
 jump(']b', first, 100)
 
-print('Cross-buffer breakpoint navigation tests passed')
+for _, background in ipairs({ 'light', 'dark' }) do
+    vim.o.background = background
+    vim.cmd.colorscheme('default')
+    local stopped = vim.api.nvim_get_hl(0, { name = 'DapStoppedLine', link = false })
+    local cursorline = vim.api.nvim_get_hl(0, { name = 'CursorLine', link = false })
+    assert(vim.deep_equal(stopped, cursorline), 'stopped lines must follow the active theme')
+    local breakpoint = vim.api.nvim_get_hl(0, { name = 'DapBreakpoint', link = false })
+    local diagnostic = vim.api.nvim_get_hl(0, { name = 'DiagnosticError', link = false })
+    assert(breakpoint.fg == diagnostic.fg, 'breakpoint colors must survive colorscheme reloads')
+end
+
+print('Breakpoint navigation and theme-aware debugger tests passed')

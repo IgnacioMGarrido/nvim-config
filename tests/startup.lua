@@ -8,6 +8,8 @@ package.preload['config.lazy'] = function()
 end
 
 dofile('init.lua')
+assert(vim.fn.maparg(' o', 'n') == '', 'Obsidian prefix must not run a standalone action')
+assert(vim.fn.maparg(' rs', 'n') ~= '', 'source action must have a non-prefix binding')
 assert(vim.go.conceallevel == 0)
 local source = vim.api.nvim_get_current_buf()
 vim.bo.filetype = 'cpp'
