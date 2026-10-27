@@ -1,3 +1,4 @@
+vim.opt.rtp:prepend(vim.fn.getcwd())
 package.loaded['config.lazy'] = nil
 package.preload['config.lazy'] = function()
     assert(vim.g.have_nerd_font == true, 'font settings must precede plugin setup')
