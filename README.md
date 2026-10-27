@@ -56,7 +56,7 @@ nvim/
 | [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) | File tree |
 | [oil.nvim](https://github.com/stevearc/oil.nvim) | Directory editor |
 | [mini.nvim](https://github.com/echasnovski/mini.nvim) | Surround, text objects, statusline |
-| [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) | Kanagawa Wave colorscheme |
+| [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) | Kanagawa Lotus colorscheme |
 | [which-key.nvim](https://github.com/folke/which-key.nvim) | Keymap hints |
 | [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | TODO/FIXME highlights |
 | [obsidian.nvim](https://github.com/epwalsh/obsidian.nvim) | Markdown vaults and daily notes |

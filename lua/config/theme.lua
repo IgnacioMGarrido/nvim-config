@@ -1,13 +1,14 @@
 local theme = {}
 
 theme.opts = {
-    theme = "wave",
+    theme = "lotus",
     transparent = false,
 }
 
 function theme.apply()
+    vim.o.background = "light"
     require("kanagawa").setup(theme.opts)
-    vim.cmd.colorscheme("kanagawa-wave")
+    vim.cmd.colorscheme("kanagawa-lotus")
 end
 
 function theme.toggle_transparent()
