@@ -47,8 +47,8 @@ vim.o.synmaxcol = 300
 
 -- File Handling
 vim.o.backup = false
-vim.o.writebackup = false
-vim.o.swapfile = false
+vim.o.writebackup = true
+vim.o.swapfile = true
 vim.o.undofile = true
 vim.o.undodir = vim.fn.expand("~/.vim/undodir")
 vim.o.updatetime = 300
