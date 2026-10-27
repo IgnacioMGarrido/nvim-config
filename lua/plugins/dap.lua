@@ -88,7 +88,8 @@ return {
                 end
                 if #all == 0 then return end
                 table.sort(all, function(a, b)
-                    return a.bufnr ~= b.bufnr and a.bufnr < b.bufnr or a.line < b.line
+                    if a.bufnr ~= b.bufnr then return a.bufnr < b.bufnr end
+                    return a.line < b.line
                 end)
 
                 local cur_buf = vim.api.nvim_get_current_buf()
